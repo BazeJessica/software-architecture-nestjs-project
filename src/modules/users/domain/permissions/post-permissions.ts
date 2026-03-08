@@ -21,4 +21,9 @@ export class PostPermissions {
 
     return post.status === 'accepted';
   }
+
+  public canSubmitPostForReview(post: PostEntity): boolean {
+    if (this.role === 'admin') return true;
+    return post.status === 'draft' && post.authorId === this.userId;
+  }
 }

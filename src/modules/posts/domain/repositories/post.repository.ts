@@ -32,4 +32,10 @@ export abstract class PostRepository {
   ): void | Promise<void>;
 
   public abstract deletePost(id: string): void | Promise<void>;
+
+  public abstract submitPostForReview(id: string): void | Promise<void>;
+
+  public abstract approvePost(id: string): void | Promise<void>;
+
+  public abstract rejectPost(id: string): void | Promise<void>;
 }

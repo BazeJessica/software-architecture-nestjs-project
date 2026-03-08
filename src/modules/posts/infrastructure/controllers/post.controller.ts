@@ -21,6 +21,8 @@ import { UpdatePostUseCase } from '../../application/use-cases/update-post.use-c
 
 @Controller('posts')
 export class PostController {
+  approvePostUseCase: any;
+  submitPostForReviewUseCase: any;
   constructor(
     private readonly createPostUseCase: CreatePostUseCase,
     private readonly updatePostUseCase: UpdatePostUseCase,
@@ -70,5 +72,30 @@ export class PostController {
   @Delete(':id')
   public async deletePost(@Param('id') id: string) {
     return this.deletePostUseCase.execute(id);
+  }
+
+  @Patch(':id/submit')
+  @UseGuards(JwtAuthGuard)
+  public async submitPostForReview(@Param('id') id: string){
+    return this.submitPostForReviewUseCase.execute(id);
+  }
+
+  @Patch(':id/approve')
+  @UseGuards(JwtAuthGuard)
+  @Roles('moderator')
+  public async approvePost(@Param('id') id: string){
+    return this.approvePostUseCase.execute(id);
+  }
+
+   @Patch(':id/reject')
+   @UseGuards(JwtAuthGuard)
+   @Roles('moderator')
+  public async rejectPost(@Param('id') id: string) {
+    return this.createPostUseCase.execute(id);
+}
+
+@Get(':id/tags')
+  public async getPostTags(@Param('tag') id: string) {
+  // Implement logic to get tags for the post with the given id
   }
 }

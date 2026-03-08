@@ -74,4 +74,28 @@ export class PostEntity {
       this._content = new PostContent(content);
     }
   }
+
+  public submitForReview() {
+    if (this._status !== 'draft') {
+      throw new Error('only draft posts can be submtted for review');
+    }
+
+    this._status = 'waiting';
+  }
+
+  public approve() {
+    if (this._status !== 'waiting') {
+      throw new Error('only waiting posts can be approved');
+    }
+
+    this._status = 'accepted';
+  }
+
+  public reject() {
+    if (this._status !== 'waiting') {
+      throw new Error('only waiting posts can be rejected');
+    }
+
+    this._status = 'rejected';
+  }
 }
