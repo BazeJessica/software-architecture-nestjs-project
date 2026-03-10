@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { LoggingService } from '../../../shared/logging/domain/services/logging.service';
+import { TagRepository } from '../../domain/repository/tag.repository';
+import { UpdateTagDto } from '../dtos/update-tags.dto';
+import { UserEntity } from 'src/modules/users/domain/entities/user.entity';
+import { UserCannotUpdateTagException } from '../../domain/exceptions/user-cannot-update-tag.exception';
+
 @Injectable()
 export class UpdateTagUseCase {
   constructor(
@@ -7,13 +12,32 @@ export class UpdateTagUseCase {
     private readonly loggingService: LoggingService,
   ) {}
 
-  public async execute(id: string, input: UpdateTagDto): Promise<void> {
+  public async execute(
+    id: string,
+    input: UpdateTagDto,
+    user: UserEntity,
+  ): Promise<void> {
+    if (!user.permissions.tags.canUpdate()) {
+      throw new UserCannotUpdateTagException();
+    }
+
+    const name = input.name.toLowerCase();
+    const existingTag = await this.tagRepository.findById(input.id);
+    if (!existingTag) {
+      throw new Error(`Tag with id ${input.id} not found`);
+    }
+
+    const existingNameTag = await this.tagRepository.findByName(name);
+    if (existingNameTag && existingNameTag.id !== command.id) {
+      throw new Error(`Tag with name ${name} already exists`);
+    }
+
     this.loggingService.log('UpdateTagUseCase.execute');
-    const tag = await this.tagRepository.getTagById(id);
+    const tag = await this.tagRepository.findById(id);
 
     if (tag) {
-      tag.update(input.name, input.length);
-      await this.tagRepository.updateTag(id, tag);
+      tag.update(input.name);
+      await this.tagRepository.updatetag(id, tag);
     }
   }
 }

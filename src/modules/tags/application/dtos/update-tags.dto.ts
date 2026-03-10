@@ -1,5 +1,4 @@
 export class UpdateTagDto {
-  name?: string;
-
-  length?: number;
+  id: string;
+  name: string;
 }
