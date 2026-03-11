@@ -11,6 +11,7 @@ export class PostEntity {
   private _authorId: string;
   private _status: PostStatus;
   private _tags: TagEntity[];
+  private _slug: string;
 
   private constructor(
     readonly id: string,
@@ -19,12 +20,14 @@ export class PostEntity {
     authorId: string,
     status: PostStatus,
     tags: TagEntity[] = [],
+    slug = '',
   ) {
     this._title = title;
     this._content = content;
     this._authorId = authorId;
     this._status = status;
     this._tags = tags;
+    this._slug = slug;
   }
 
   public get status() {
@@ -39,6 +42,19 @@ export class PostEntity {
     return this._tags;
   }
 
+  public get slug(){
+    return this._slug;
+  }
+
+  static generateSlug(title: string): string {
+    return title
+       .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .trim();
+  }
+
   public static reconstitute(input: Record<string, unknown>) {
     return new PostEntity(
       input.id as string,
@@ -47,6 +63,7 @@ export class PostEntity {
       input.authorId as string,
       input.status as PostStatus,
       (input.tags as any[])?.map((t) => TagEntity.reconstitute(t)) || [],
+    (input.slug as string) || '',
     );
   }
 
@@ -58,6 +75,7 @@ export class PostEntity {
       status: this._status,
       authorId: this._authorId,
       tags: this._tags.map((t) => t.toJSON()),
+      slug: this._slug,
     };
   }
 
@@ -72,6 +90,8 @@ export class PostEntity {
       new PostContent(content),
       authorId,
       'draft',
+      [],
+      PostEntity.generateSlug(title)
     );
   }
 
@@ -94,6 +114,9 @@ export class PostEntity {
     this._tags = this._tags.filter((t) => t.id !== tagId);
   }
 
+  public updateSlug(newSlug: string) {
+    this._slug = PostEntity.generateSlug(newSlug);
+  }
   public submitForReview() {
     if (this._status !== 'draft') {
       throw new Error('only draft posts can be submtted for review');

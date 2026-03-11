@@ -24,6 +24,10 @@ export abstract class PostRepository {
     id: string,
   ): PostEntity | undefined | Promise<PostEntity | undefined>;
 
+  public abstract getPostBySlug(
+    slug: string,
+  ): PostEntity | undefined | Promise<PostEntity | undefined>;
+
   public abstract createPost(input: PostEntity): void | Promise<void>;
 
   public abstract updatePost(

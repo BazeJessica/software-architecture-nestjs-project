@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Patch,
+  Query,
   Post,
   UseGuards,
 } from '@nestjs/common';
@@ -21,12 +22,16 @@ import { UpdatePostUseCase } from '../../application/use-cases/update-post.use-c
 import { AddTagToPostUseCase } from '../../application/use-cases/add-tag-to-post.use-case';
 import { RemoveTagFromPostUseCase } from '../../application/use-cases/remove-tag-from-post.use-case';
 import { ApiResponse } from '@nestjs/swagger';
+import { GetPostBySlugUseCase } from '../../application/use-cases/get-post-by-slug.use-case';
+import { UpdatePostSlugUseCase } from '../../application/use-cases/update-post-slug-use-case';
+import { RejectPostUseCase } from '../../application/use-cases/reject-post-use-case';
 
 @Controller('posts')
 export class PostController {
   approvePostUseCase: any;
   submitPostForReviewUseCase: any;
   constructor(
+    private readonly rejectPostUseCase: RejectPostUseCase,
     private readonly createPostUseCase: CreatePostUseCase,
     private readonly updatePostUseCase: UpdatePostUseCase,
     private readonly deletePostUseCase: DeletePostUseCase,
@@ -34,11 +39,13 @@ export class PostController {
     private readonly getPostByIdUseCase: GetPostByIdUseCase,
     private readonly addTagToPostUseCase: AddTagToPostUseCase,
     private readonly removeTagFromPostUseCase: RemoveTagFromPostUseCase,
+    private readonly getPostBySlugUseCase: GetPostBySlugUseCase,
+    private readonly updatePostSlugUseCase: UpdatePostSlugUseCase,
   ) {}
 
   @Get()
-  public async getPosts() {
-    const posts = await this.getPostsUseCase.execute();
+  public async getPosts(@Query('tags') tags?: string) {
+    const posts = await this.getPostsUseCase.execute(tags);
 
     return posts.map((p) => p.toJSON());
   }
@@ -95,12 +102,27 @@ export class PostController {
 
   @Patch(':id/reject')
   @UseGuards(JwtAuthGuard)
-  @ApiResponse({ status: 200, description: 'Post approved' })
-  public async rejectPost(
+  @ApiResponse({ status: 200, description: 'Post rejected' })
+  public async rejectPost(@Param('id') id: string) {
+    return this.rejectPostUseCase.execute(id);
+  }
+
+  @Get('slug/:slug')
+  @ApiResponse({ status: 200, description: 'Post found' })
+  public async getPostBySlug(@Param('slug') slug: string) {
+    const post = await this.getPostBySlugUseCase.execute(slug);
+    return post.toJSON();
+  }
+
+  @Patch(':id/slug')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiResponse({ status: 200, description: 'Slug updated' })
+  public async updatePostSlug(
     @Param('id') id: string,
-    @Body() input: CreatePostDto,
+    @Body('slug') slug: string,
   ) {
-    return this.createPostUseCase.execute(input);
+    await this.updatePostSlugUseCase.execute(id, slug);
   }
 
   @Post(':id/tags/:tagId')
