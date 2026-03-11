@@ -21,14 +21,14 @@ export class TagEntity {
     return this._createdAt;
   }
 
-  public static create(name: string): TagEntity {
-    return new TagEntity(v4(), new TagName(name), new Date());
+  public static create(_name: string): TagEntity {
+    return new TagEntity(v4(), new TagName(_name), new Date());
   }
 
   public static reconstitute(input: Record<string, unknown>) {
     return new TagEntity(
       input.id as string,
-      new TagName(),
+      new TagName(input.name as string),
       new Date(input.createdAt as string | Date),
     );
   }
@@ -42,7 +42,7 @@ export class TagEntity {
 
   public update(name: string): void {
     if (name) {
-      this._name = new TagName();
+      this._name = new TagName(name);
     }
   }
 }

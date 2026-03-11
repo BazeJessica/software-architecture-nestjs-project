@@ -20,7 +20,7 @@ export class SQLitePostEntity {
   @Column()
   authorId: string;
 
-   @ManyToMany(() => SQLiteTagEntity, { eager: true, cascade: true })
+  @ManyToMany(() => SQLiteTagEntity, { eager: true, cascade: true })
   @JoinTable({
     name: 'posts_tags',
     joinColumn: { name: 'postId', referencedColumnName: 'id' },

@@ -13,7 +13,10 @@ export class CreateTagUseCase {
     private readonly eventEmitter: EventEmitter2,
     private readonly tagRepository: TagRepository,
   ) {}
-  public async execute(input: CreateTagDto, user: UserEntity): Promise<void> {
+  public async execute(
+    input: CreateTagDto,
+    user: UserEntity,
+  ): Promise<TagEntity> {
     if (!user.permissions.tags.canCreate()) {
       throw new UserCannotCreateTagException();
     }
@@ -29,5 +32,7 @@ export class CreateTagUseCase {
       tagId: tag.id,
       name: input.name,
     });
+
+    return tag;
   }
 }

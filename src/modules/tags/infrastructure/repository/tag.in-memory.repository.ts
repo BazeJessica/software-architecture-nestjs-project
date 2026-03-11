@@ -6,32 +6,47 @@ import { TagEntity } from '../../domain/entities/tag.entity';
 export class InMemoryTagRepository implements TagRepository {
   private tags: Record<string, unknown>[] = [];
 
-  public getTags(): TagEntity[] {
+  public async findAll(): Promise<TagEntity[]> {
     console.log('InMemoryPostRepository.getTags');
-    return this.tags.map((tag) => TagEntity.reconstitute(tag));
+    return Promise.resolve(this.tags.map((tag) => TagEntity.reconstitute(tag)));
   }
 
-  public getTagById(id: string) {
+  public async findById(id: string): Promise<TagEntity | null> {
     const tag = this.tags.find((tag) => tag.id === id);
 
     if (tag) {
-      return TagEntity.reconstitute(tag);
+      return Promise.resolve(TagEntity.reconstitute(tag));
     }
-  }
-  public createTag(input: TagEntity) {
-    this.tags.push(input.toJson());
+    return Promise.resolve(null);
   }
 
-  public updateTag(id: string, input: TagEntity) {
+  public async findByName(name: string): Promise<TagEntity | null> {
+    const tag = this.tags.find((tag) => tag.name === name);
+
+    if (tag) {
+      return Promise.resolve(TagEntity.reconstitute(tag));
+    }
+    return Promise.resolve(null);
+  }
+
+  public async createTag(input: TagEntity): Promise<void> {
+    this.tags.push(input.toJSON());
+    return Promise.resolve();
+  }
+
+  public async updatetag(id: string, input: TagEntity): Promise<void> {
     this.tags = this.tags.map((tag) => {
       if (tag.id !== id) {
         return tag;
       }
-      return input.toJson();
+      return input.toJSON();
     });
+    return Promise.resolve();
   }
 
-  public deleteTag(id: string) {
+  public async deleteTag(id: string): Promise<void> {
     this.tags = this.tags.filter((tag) => tag.id !== id);
+    return Promise.resolve();
   }
 }
+

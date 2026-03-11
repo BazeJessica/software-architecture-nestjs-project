@@ -4,6 +4,7 @@ import { TagRepository } from '../../domain/repository/tag.repository';
 import { UpdateTagDto } from '../dtos/update-tags.dto';
 import { UserEntity } from 'src/modules/users/domain/entities/user.entity';
 import { UserCannotUpdateTagException } from '../../domain/exceptions/user-cannot-update-tag.exception';
+import { TagEntity } from '../../domain/entities/tag.entity';
 
 @Injectable()
 export class UpdateTagUseCase {
@@ -16,7 +17,7 @@ export class UpdateTagUseCase {
     id: string,
     input: UpdateTagDto,
     user: UserEntity,
-  ): Promise<void> {
+  ): Promise<TagEntity> {
     if (!user.permissions.tags.canUpdate()) {
       throw new UserCannotUpdateTagException();
     }
@@ -28,7 +29,7 @@ export class UpdateTagUseCase {
     }
 
     const existingNameTag = await this.tagRepository.findByName(name);
-    if (existingNameTag && existingNameTag.id !== command.id) {
+    if (existingNameTag && existingNameTag.id !== input.id) {
       throw new Error(`Tag with name ${name} already exists`);
     }
 
@@ -38,6 +39,9 @@ export class UpdateTagUseCase {
     if (tag) {
       tag.update(input.name);
       await this.tagRepository.updatetag(id, tag);
+      return tag;
     }
+
+    throw new Error(`Tag with id ${id} not found`);
   }
 }

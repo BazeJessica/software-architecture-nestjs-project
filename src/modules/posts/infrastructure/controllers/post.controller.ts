@@ -22,7 +22,6 @@ import { AddTagToPostUseCase } from '../../application/use-cases/add-tag-to-post
 import { RemoveTagFromPostUseCase } from '../../application/use-cases/remove-tag-from-post.use-case';
 import { ApiResponse } from '@nestjs/swagger';
 
-
 @Controller('posts')
 export class PostController {
   approvePostUseCase: any;

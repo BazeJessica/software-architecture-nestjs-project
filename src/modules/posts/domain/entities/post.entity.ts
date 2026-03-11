@@ -57,7 +57,7 @@ export class PostEntity {
       content: this._content.toString(),
       status: this._status,
       authorId: this._authorId,
-      tags: this._tags.map((t) => t.toJson()),
+      tags: this._tags.map((t) => t.toJSON()),
     };
   }
 
@@ -90,7 +90,7 @@ export class PostEntity {
       this._tags.push(tag);
     }
   }
- public removeTag(tagId: string) {
+  public removeTag(tagId: string) {
     this._tags = this._tags.filter((t) => t.id !== tagId);
   }
 

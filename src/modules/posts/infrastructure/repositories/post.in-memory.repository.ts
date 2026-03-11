@@ -37,7 +37,7 @@ export class InMemoryPostRepository implements PostRepository {
     this.posts = this.posts.filter((post) => post.id !== id);
   }
 
-  public async submitPostForReview(id: string): Promise<void> {
+  public submitPostForReview(id: string): void {
     const postRecord = this.posts.find((p) => p.id === id);
     if (postRecord) {
       const post = PostEntity.reconstitute(postRecord);
@@ -46,7 +46,7 @@ export class InMemoryPostRepository implements PostRepository {
     }
   }
 
-  public async approvePost(id: string): Promise<void> {
+  public approvePost(id: string): void {
     const postRecord = this.posts.find((p) => p.id === id);
     if (postRecord) {
       const post = PostEntity.reconstitute(postRecord);
@@ -55,7 +55,7 @@ export class InMemoryPostRepository implements PostRepository {
     }
   }
 
-  public async rejectPost(id: string): Promise<void> {
+  public rejectPost(id: string): void {
     const postRecord = this.posts.find((p) => p.id === id);
     if (postRecord) {
       const post = PostEntity.reconstitute(postRecord);
