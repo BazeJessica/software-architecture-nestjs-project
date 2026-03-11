@@ -18,6 +18,10 @@ import { DeletePostUseCase } from '../../application/use-cases/delete-post.use-c
 import { GetPostByIdUseCase } from '../../application/use-cases/get-post-by-id.use-case';
 import { GetPostsUseCase } from '../../application/use-cases/get-posts.use-case';
 import { UpdatePostUseCase } from '../../application/use-cases/update-post.use-case';
+import { AddTagToPostUseCase } from '../../application/use-cases/add-tag-to-post.use-case';
+import { RemoveTagFromPostUseCase } from '../../application/use-cases/remove-tag-from-post.use-case';
+import { ApiResponse } from '@nestjs/swagger';
+
 
 @Controller('posts')
 export class PostController {
@@ -29,6 +33,8 @@ export class PostController {
     private readonly deletePostUseCase: DeletePostUseCase,
     private readonly getPostsUseCase: GetPostsUseCase,
     private readonly getPostByIdUseCase: GetPostByIdUseCase,
+    private readonly addTagToPostUseCase: AddTagToPostUseCase,
+    private readonly removeTagFromPostUseCase: RemoveTagFromPostUseCase,
   ) {}
 
   @Get()
@@ -76,26 +82,45 @@ export class PostController {
 
   @Patch(':id/submit')
   @UseGuards(JwtAuthGuard)
-  public async submitPostForReview(@Param('id') id: string){
+  @ApiResponse({ status: 200, description: 'Post submitted' })
+  public async submitPostForReview(@Param('id') id: string) {
     return this.submitPostForReviewUseCase.execute(id);
   }
 
   @Patch(':id/approve')
   @UseGuards(JwtAuthGuard)
-  @Roles('moderator')
-  public async approvePost(@Param('id') id: string){
+  @ApiResponse({ status: 200, description: 'Post approved' })
+  public async approvePost(@Param('id') id: string) {
     return this.approvePostUseCase.execute(id);
   }
 
-   @Patch(':id/reject')
-   @UseGuards(JwtAuthGuard)
-   @Roles('moderator')
-  public async rejectPost(@Param('id') id: string) {
-    return this.createPostUseCase.execute(id);
-}
+  @Patch(':id/reject')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ status: 200, description: 'Post approved' })
+  public async rejectPost(
+    @Param('id') id: string,
+    @Body() input: CreatePostDto,
+  ) {
+    return this.createPostUseCase.execute(input);
+  }
 
-@Get(':id/tags')
-  public async getPostTags(@Param('tag') id: string) {
-  // Implement logic to get tags for the post with the given id
+  @Post(':id/tags/:tagId')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ status: 201, description: 'Tag added' })
+  public async addTagToPost(
+    @Param('id') postId: string,
+    @Param('tagId') tagId: string,
+  ) {
+    await this.addTagToPostUseCase.execute({ postId, tagId });
+  }
+
+  @Delete(':id/tags/:tagId')
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({ status: 200, description: 'Tag removed' })
+  public async removeTagFromPost(
+    @Param('id') postId: string,
+    @Param('tagId') tagId: string,
+  ) {
+    await this.removeTagFromPostUseCase.execute({ postId, tagId });
   }
 }

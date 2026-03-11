@@ -36,4 +36,31 @@ export class InMemoryPostRepository implements PostRepository {
   public deletePost(id: string) {
     this.posts = this.posts.filter((post) => post.id !== id);
   }
+
+  public async submitPostForReview(id: string): Promise<void> {
+    const postRecord = this.posts.find((p) => p.id === id);
+    if (postRecord) {
+      const post = PostEntity.reconstitute(postRecord);
+      post.submitForReview();
+      this.updatePost(id, post);
+    }
+  }
+
+  public async approvePost(id: string): Promise<void> {
+    const postRecord = this.posts.find((p) => p.id === id);
+    if (postRecord) {
+      const post = PostEntity.reconstitute(postRecord);
+      post.approve();
+      this.updatePost(id, post);
+    }
+  }
+
+  public async rejectPost(id: string): Promise<void> {
+    const postRecord = this.posts.find((p) => p.id === id);
+    if (postRecord) {
+      const post = PostEntity.reconstitute(postRecord);
+      post.reject();
+      this.updatePost(id, post);
+    }
+  }
 }

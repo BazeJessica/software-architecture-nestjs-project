@@ -1,16 +1,21 @@
-import { Injectable } from '@nestjs/common';
-import { LoggingService } from '../../../shared/logging/domain/services/logging.service';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PostRepository } from '../../domain/repositories/post.repository';
 
 @Injectable()
 export class SubmitPostForReviewUseCase {
   constructor(
-    private readonly loggingService: LoggingService,
     private readonly postRepository: PostRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  public async execute(id: string): Promise<void> {
-    this.loggingService.log('SubmitPostForReviewUseCase.execute');
-    await this.postRepository.submitPostForReview(id);
+  async execute(postId: string): Promise<void> {
+    const post = await this.postRepository.getPostById(postId);
+    if (!post) {
+      throw new NotFoundException(`Post with id ${postId} not found`);
+    }
+
+    post.submitForReview();
+    await this.postRepository.submitPostForReview(post.id);
   }
 }
