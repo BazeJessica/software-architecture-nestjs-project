@@ -32,7 +32,7 @@ export class UpdateCommentUseCase {
     }
 
     comment.update(command.content);
-    await this.commentRepository.save(comment);
+    await this.commentRepository.updateComment(comment);
     return comment;
   }
 }
