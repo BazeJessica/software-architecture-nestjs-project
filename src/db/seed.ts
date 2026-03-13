@@ -11,6 +11,8 @@
  */
 
 import 'reflect-metadata';
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { DataSource } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { SQLiteUserEntity } from '../modules/users/infrastructure/entities/user.sqlite.entity';

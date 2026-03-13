@@ -21,6 +21,7 @@ import { NotificationModule } from './modules/notifications/notification.module'
         NODE_ENV: Joi.string()
           .valid('development', 'production', 'test')
           .required(),
+        JWT_SECRET: Joi.string().required(),
       }),
     }),
     AuthModule,
