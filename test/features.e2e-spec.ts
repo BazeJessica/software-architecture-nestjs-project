@@ -26,7 +26,7 @@ describe('Features E2E', () => {
     dataSource = app.get(DataSource);
     const configService = app.get(ConfigService);
     console.log('E2E DATABASE_URL:', configService.get('DATABASE_URL'));
-  });
+  }, 60000);
 
   afterAll(async () => {
     await dataSource.dropDatabase();
@@ -37,7 +37,7 @@ describe('Features E2E', () => {
     const username = `user_${Date.now()}`;
     await request(app.getHttpServer())
       .post('/users')
-      .send({ username, password: 'password123', role: 'writer' })
+      .send({ username, password: 'password123', role: 'admin' })
       .expect(201);
 
     const loginRes = await request(app.getHttpServer())
@@ -62,19 +62,13 @@ describe('Features E2E', () => {
   });
 
   it('3. Create Tag and add to Post', async () => {
-    // There is no dedicated Tag Controller yet in the provided code, but I added TagEntity.
-    // Wait, let's check if I added Tag controller.
-    // I added AddTagToPost to PostController.
-    // I should create a tag manually in the DB or via Tag endpoint if it exists.
+    const tagRes = await request(app.getHttpServer())
+      .post('/tags')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ name: 'nestjs' })
+      .expect(201);
 
-    // Let's check Tag endpoints.
-    // Earlier I saw TagRepository and GetTagsUseCase.
-
-    // For test simplicity, let's just insert a tag into the DB.
-    const tag = await dataSource.query(
-      `INSERT INTO tags (id, name) VALUES ('tag-1', 'nestjs') RETURNING id`,
-    );
-    tagId = 'tag-1';
+    tagId = tagRes.body.id;
 
     await request(app.getHttpServer())
       .post(`/posts/${postId}/tags/${tagId}`)
@@ -93,14 +87,35 @@ describe('Features E2E', () => {
 
   it('4. Comment on Post (after approving it)', async () => {
     // Must be accepted to comment
+    // Submit for review first
+    await request(app.getHttpServer())
+      .patch(`/posts/${postId}/submit`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .expect(200);
+
+    // Approve
     await request(app.getHttpServer())
       .patch(`/posts/${postId}/approve`)
       .set('Authorization', `Bearer ${authToken}`)
       .expect(200);
 
+    // Create second user to comment
+    const otherUsername = `user2_${Date.now()}`;
+    await request(app.getHttpServer())
+      .post('/users')
+      .send({ username: otherUsername, password: 'password123', role: 'writer' })
+      .expect(201);
+
+    const otherLoginRes = await request(app.getHttpServer())
+      .post('/auth/login')
+      .send({ username: otherUsername, password: 'password123' })
+      .expect(201);
+
+    const otherAuthToken = otherLoginRes.body.access_token;
+
     const commentRes = await request(app.getHttpServer())
       .post(`/posts/${postId}/comments`)
-      .set('Authorization', `Bearer ${authToken}`)
+      .set('Authorization', `Bearer ${otherAuthToken}`)
       .send({ content: 'Nice post!' })
       .expect(201);
 
