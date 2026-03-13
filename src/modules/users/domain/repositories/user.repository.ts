@@ -6,4 +6,5 @@ export abstract class UserRepository {
   public abstract createUser(input: UserEntity): Promise<void>;
   public abstract updateUser(id: string, input: UserEntity): Promise<void>;
   public abstract deleteUser(id: string): Promise<void>;
+  public abstract getUsersByRole(role: string): Promise<UserEntity[]>;
 }

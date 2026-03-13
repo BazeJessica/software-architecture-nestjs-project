@@ -64,4 +64,8 @@ export class SQLiteCommentRepository implements CommentRepository {
   async deleteComment(id: string): Promise<void> {
     await this.dataSource.getRepository(SQLiteCommentEntity).delete(id);
   }
+
+  async deleteByPostId(postId: string): Promise<void> {
+    await this.dataSource.getRepository(SQLiteCommentEntity).delete({ postId });
+  }
 }

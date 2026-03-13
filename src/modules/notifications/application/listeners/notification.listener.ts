@@ -11,10 +11,19 @@ export class CommentCreatedEventPayload {
   postAuthorId: string;
 }
 
-export class PostCreatedEventPayload {
+export class PostStatusChangedEventPayload {
   postId: string;
   authorId: string;
   title: string;
+  previousStatus: string;
+  newStatus: string;
+}
+
+export class PostDeletedEventPayload {
+  postId: string;
+  authorId: string;
+  title: string;
+  deleterId: string;
 }
 
 @Injectable()
@@ -26,28 +35,77 @@ export class NotificationListener {
 
   @OnEvent('comment.created')
   async handleCommentCreated(payload: CommentCreatedEventPayload): Promise<void> {
-    // Notify the post author that someone commented on their post
     if (payload.postAuthorId !== payload.authorId) {
+      const user = await this.userRepository.getUserById(payload.authorId);
+      const username = user ? user.toJSON().username : 'Someone';
       const notification = NotificationEntity.create(
         payload.postAuthorId,
         'New Comment',
-        `Someone commented on your post.`,
+        `${username} commented on your post: '${payload.postId}'`,
       );
       await this.notificationRepository.save(notification);
     }
   }
 
-  @OnEvent('post.created')
-  async handlePostCreated(payload: PostCreatedEventPayload): Promise<void> {
-    // Notify all followers of the author that a new post was published
-    const author = await this.userRepository.getUserById(payload.authorId);
-    if (!author) return;
+  @OnEvent('post.status-changed')
+  async handlePostStatusChanged(payload: PostStatusChangedEventPayload): Promise<void> {
+    // 1. If status changed to 'waiting' (PENDING_REVIEW), notify all Moderators
+    if (payload.newStatus === 'waiting') {
+      const moderators = await this.userRepository.getUsersByRole('moderator');
+      for (const mod of moderators) {
+        const notification = NotificationEntity.create(
+          mod.id,
+          'New Post Pending Review',
+          `New post pending review: '${payload.title}'`,
+        );
+        await this.notificationRepository.save(notification);
+      }
+    }
 
-    for (const followerId of author.followers) {
+    // 2. If status changed to 'accepted', notify Author and Followers
+    if (payload.newStatus === 'accepted') {
+      // Notify Author
+      const approvedNotif = NotificationEntity.create(
+        payload.authorId,
+        'Post Approved',
+        `Your post '${payload.title}' has been approved.`,
+      );
+      await this.notificationRepository.save(approvedNotif);
+
+      // Notify Followers
+      const author = await this.userRepository.getUserById(payload.authorId);
+      if (author) {
+        const username = author.toJSON().username;
+        for (const followerId of author.followers) {
+          const followNotif = NotificationEntity.create(
+            followerId,
+            'New Post',
+            `${username} published a new post: '${payload.title}'`,
+          );
+          await this.notificationRepository.save(followNotif);
+        }
+      }
+    }
+
+    // 3. If status changed to 'rejected', notify Author
+    if (payload.newStatus === 'rejected') {
+      const rejectedNotif = NotificationEntity.create(
+        payload.authorId,
+        'Post Rejected',
+        `Your post '${payload.title}' has been rejected.`,
+      );
+      await this.notificationRepository.save(rejectedNotif);
+    }
+  }
+
+  @OnEvent('post.deleted')
+  async handlePostDeleted(payload: PostDeletedEventPayload): Promise<void> {
+    // Notify creator that post was deleted ONLY if deleted by someone else (Mod/Admin)
+    if (payload.deleterId !== payload.authorId) {
       const notification = NotificationEntity.create(
-        followerId,
-        'New Post',
-        `${payload.title} was published by someone you follow.`,
+        payload.authorId,
+        'Post Deleted',
+        `Your post '${payload.title}' was deleted by a moderator.`,
       );
       await this.notificationRepository.save(notification);
     }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
 import { PostEntity } from '../../domain/entities/post.entity';
@@ -20,13 +20,16 @@ export class CreatePostUseCase {
     }
 
     const post = PostEntity.create(input.title, input.content, input.authorId);
+    
+    // If a custom slug is provided, use it as the base
+    const baseSlug = input.slug ? PostEntity.generateSlug(input.slug) : post.slug;
 
-    let slug = post.slug;
+    let slug = baseSlug;
     let counter = 1;
     let existingPost = await this.postRepository.getPostBySlug(slug);
     while (existingPost) {
       counter++;
-      slug = `${post.slug}-${counter}`;
+      slug = `${baseSlug}-${counter}`;
       existingPost = await this.postRepository.getPostBySlug(slug);
     }
     

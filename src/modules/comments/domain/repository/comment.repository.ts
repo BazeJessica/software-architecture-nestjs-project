@@ -14,6 +14,8 @@ export abstract class CommentRepository {
     id: string,
     input: CommentEntity,
   ): void | Promise<void>;
+
+  public abstract deleteByPostId(postId: string): Promise<void>;
 }
 
 export const COMMENT_REPOSITORY_TOKEN = 'COMMENT_REPOSITORY_TOKEN';

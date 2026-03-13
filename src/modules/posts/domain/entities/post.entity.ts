@@ -47,12 +47,18 @@ export class PostEntity {
   }
 
   static generateSlug(title: string): string {
-    return title
-       .toLowerCase()
+    let slug = title
+      .toLowerCase()
       .replace(/[^a-z0-9\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
       .trim();
+
+    if (!slug || slug === '-') {
+      slug = `post-${Math.random().toString(36).substring(2, 9)}`;
+    }
+
+    return slug.substring(0, 100);
   }
 
   public static reconstitute(input: Record<string, unknown>) {

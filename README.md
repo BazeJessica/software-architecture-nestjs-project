@@ -2,36 +2,18 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
 A clean-architecture, DDD-based Medium-like API built with [NestJS](https://github.com/nestjs/nest).
 
 ### Features
 
-- **Tags System**: Manage tags and filter posts by them.
-- **Post Slugs**: SEO-friendly unique slugs for every post.
-- **Comments System**: Robust commenting system with ownership guards and event-driven notifications.
-- **Subscriptions & Notifications**: Follow users and receive notifications for activity (new posts, comments, review status changes).
-- **Clean Architecture**: Adheres to DDD, Use Cases, Repository, and Event-Driven patterns.
+- **Tags System**: Manage tags (Admin only), link them to posts, and filter posts by them.
+- **Post Slugs**: Unique, SEO-friendly slugs generated from titles with manual override support.
+- **Comments System**: Comment on accepted posts, with author notifications and recursive deletion rules.
+- **Subscriptions & Notifications**: Follow/unfollow system with event-driven notifications for all major activities.
+- **ABAC Security**: Attribute-Based Access Control enforcing fine-grained permissions across all modules.
+- **Swagger Documentation**: Fully documented API with decorators and operation descriptions.
 
 ## Project Setup
 
@@ -40,17 +22,16 @@ A clean-architecture, DDD-based Medium-like API built with [NestJS](https://gith
 $ npm install
 
 # Configure environment
-# Ensure .env exists with DATABASE_URL (e.g., ./db/sqlite.db)
+# Copy .env.example to .env and adjust variables
+$ cp .env.example .env
 ```
 
-## Database Initialization & Seeding
+## Database Seeding
+
+Populate the database with initial users (admin, moderator, writer, reader), tags, and posts:
 
 ```bash
-# Create the database directory
-$ mkdir db
-
-# Run the seeding script (populates users, posts, tags, and comments)
-$ npx ts-node -r tsconfig-paths/register src/db/seed.ts
+$ npm run seed
 ```
 
 ## Compile and Run
@@ -59,14 +40,11 @@ $ npx ts-node -r tsconfig-paths/register src/db/seed.ts
 # development
 $ npm run start
 
-# watch mode
+# watch mode (recommended for development)
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Swagger API Documentation
+## API Documentation
 
 Once the app is running, visit:
 `http://localhost:3000/api`
@@ -79,9 +57,6 @@ $ npm run test
 
 # e2e tests
 $ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
 ## License

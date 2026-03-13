@@ -10,6 +10,7 @@ import { GetCommentsForPostUseCase } from './application/use-cases/get-comment.u
 import { UpdateCommentUseCase } from './application/use-cases/update-comment.use-case';
 import { DeleteCommentUseCase } from './application/use-cases/delete-comment.use-case';
 import { CountCommentUseCase } from './application/use-cases/count-comment.use-case';
+import { CommentCleanupListener } from './application/listeners/comment-cleanup.listener';
 
 @Module({
   imports: [TypeOrmModule.forFeature([SQLiteCommentEntity]), PostModule],
@@ -24,6 +25,7 @@ import { CountCommentUseCase } from './application/use-cases/count-comment.use-c
     UpdateCommentUseCase,
     DeleteCommentUseCase,
     CountCommentUseCase,
+    CommentCleanupListener,
   ],
   exports: [COMMENT_REPOSITORY_TOKEN],
 })

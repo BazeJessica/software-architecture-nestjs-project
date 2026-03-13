@@ -7,8 +7,10 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
@@ -21,7 +23,7 @@ import { CreateCommentDto } from '../../application/dtos/create-comment.dtos';
 import { UpdateCommentDto } from '../../application/dtos/update-comment.dtos';
 
 @ApiTags('Comments')
-@Controller('posts/:postId/comments')
+@Controller()
 export class CommentController {
   constructor(
     private readonly createCommentUseCase: CreateCommentUseCase,
@@ -31,9 +33,11 @@ export class CommentController {
     private readonly countCommentUseCase: CountCommentUseCase,
   ) {}
 
-  @Post()
+  @Post('posts/:postId/comments')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({ summary: 'Create a comment on a post' })
   @ApiResponse({ status: 201, description: 'Created comment successfully.' })
   async create(
     @Param('postId') postId: string,
@@ -43,28 +47,31 @@ export class CommentController {
     const comment = await this.createCommentUseCase.execute({
       postId,
       content: dto.content,
-      authorId: user?.id ?? '',
+      authorId: user.id,
     });
     return comment.toJSON();
   }
 
-  @Get()
-  @ApiResponse({ status: 200, description: 'All comments for a post' })
+  @Get('posts/:postId/comments')
+  @ApiOperation({ summary: 'Get all comments for a post' })
+  @ApiResponse({ status: 200, description: 'List of comments.' })
   async findAll(@Param('postId') postId: string) {
     const comments = await this.getCommentsForPostUseCase.execute(postId);
     return comments.map((c) => c.toJSON());
   }
 
-  @Get('count')
-  @ApiResponse({ status: 200, description: 'Count of all comments for post' })
+  @Get('posts/:postId/comments/count')
+  @ApiOperation({ summary: 'Get comment count for a post' })
+  @ApiResponse({ status: 200, description: 'Count of comments.' })
   async count(@Param('postId') postId: string) {
     const count = await this.countCommentUseCase.execute(postId);
-    return { count };
+    return { postId, count };
   }
 
-  @Patch(':id')
+  @Patch('comments/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update a comment' })
   @ApiResponse({ status: 200, description: 'Updated comment successfully.' })
   async update(
     @Param('id') id: string,
@@ -74,14 +81,16 @@ export class CommentController {
     const comment = await this.updateCommentUseCase.execute({
       commentId: id,
       content: dto.content,
-      requesterId: user?.id ?? '',
+      requesterId: user.id,
     });
     return comment.toJSON();
   }
 
-  @Delete(':id')
+  @Delete('comments/:id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a comment' })
   @ApiResponse({ status: 204, description: 'Deleted comment successfully.' })
   async remove(
     @Param('id') id: string,
