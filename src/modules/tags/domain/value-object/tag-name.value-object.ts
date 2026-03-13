@@ -11,12 +11,12 @@ export class TagName {
       throw new Error('Tag name cannot be empty');
     }
 
-    if (name.length >= 50) {
-      throw new Error('Tag name too long (max 49 chars)');
+    if (name.length > 50) {
+      throw new Error('Tag name too long (max 50 chars)');
     }
 
-    if (name.length < 3) {
-      throw new Error('Tag name too short (min 3 chars)');
+    if (name.length < 2) {
+      throw new Error('Tag name too short (min 2 chars)');
     }
 
     const regex = /^[a-z0-9-]+$/;

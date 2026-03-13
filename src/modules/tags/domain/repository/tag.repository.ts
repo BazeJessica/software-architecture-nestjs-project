@@ -11,7 +11,7 @@ export abstract class TagRepository {
 
   public abstract createTag(tag: TagEntity): Promise<void>;
 
-  public abstract updatetag(id: string, input: TagEntity): void | Promise<void>;
+  public abstract updateTag(id: string, input: TagEntity): void | Promise<void>;
 }
 
 export const TAG_REPOSITORY_TOKEN = 'TAG_REPOSITORY_TOKEN';

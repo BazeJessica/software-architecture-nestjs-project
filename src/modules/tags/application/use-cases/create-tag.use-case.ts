@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { TagEntity } from '../../domain/entities/tag.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { UserEntity } from 'src/modules/users/domain/entities/user.entity';
-import { CreateTagDto } from '../dtos/creaye-tags.dto';
+import { CreateTagDto } from '../dtos/create-tags.dto';
 import { UserCannotCreateTagException } from '../../domain/exceptions/user-cannot-create-tag.exception';
 import { TagRepository } from '../../domain/repository/tag.repository';
 import { TagCreatedEvent } from '../../domain/event/tag-created.event';
@@ -12,7 +12,7 @@ export class CreateTagUseCase {
   constructor(
     private readonly eventEmitter: EventEmitter2,
     private readonly tagRepository: TagRepository,
-  ) {}
+  ) { }
   public async execute(
     input: CreateTagDto,
     user: UserEntity,
