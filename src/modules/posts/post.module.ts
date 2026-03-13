@@ -11,6 +11,8 @@ import { GetPostsUseCase } from './application/use-cases/get-posts.use-case';
 import { UpdatePostUseCase } from './application/use-cases/update-post.use-case';
 import { AddTagToPostUseCase } from './application/use-cases/add-tag-to-post.use-case';
 import { RemoveTagFromPostUseCase } from './application/use-cases/remove-tag-from-post.use-case';
+import { GetPostBySlugUseCase } from './application/use-cases/get-post-by-slug.use-case';
+import { UpdatePostSlugUseCase } from './application/use-cases/update-post-slug-use-case';
 import { PostRepository } from './domain/repositories/post.repository';
 import { PostController } from './infrastructure/controllers/post.controller';
 // import { InMemoryPostRepository } from './infrastructure/repositories/post.in-memory.repository';
@@ -40,6 +42,8 @@ import { RejectPostUseCase } from './application/use-cases/reject-post-use-case'
     GetPostByIdUseCase,
     AddTagToPostUseCase,
     RemoveTagFromPostUseCase,
+    GetPostBySlugUseCase,
+    UpdatePostSlugUseCase,
     SubmitPostForReviewUseCase,
     ApprovePostUseCase,
     RejectPostUseCase,

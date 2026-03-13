@@ -12,6 +12,6 @@ export class GetPostsUseCase {
 
   public async execute(tags?: string | undefined): Promise<PostEntity[]> {
     this.loggingService.log('GetPostsUseCase.execute');
-    return this.postRepository.getPosts();
+    return this.postRepository.getPosts(tags);
   }
 }

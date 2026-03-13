@@ -14,18 +14,32 @@ export class CreatePostUseCase {
     private readonly postRepository: PostRepository,
   ) {}
 
-  public async execute(input: CreatePostDto, user?: UserEntity): Promise<void> {
+  public async execute(input: CreatePostDto, user?: UserEntity): Promise<PostEntity> {
     if (user && !user.permissions.posts.canCreate()) {
       throw new UserCannotCreatePostException();
     }
 
     const post = PostEntity.create(input.title, input.content, input.authorId);
 
+    let slug = post.slug;
+    let counter = 1;
+    let existingPost = await this.postRepository.getPostBySlug(slug);
+    while (existingPost) {
+      counter++;
+      slug = `${post.slug}-${counter}`;
+      existingPost = await this.postRepository.getPostBySlug(slug);
+    }
+    
+    post.updateSlug(slug);
+
     await this.postRepository.createPost(post);
 
     this.eventEmitter.emit(PostCreatedEvent, {
       postId: post.id,
       authorId: input.authorId,
+      title: input.title,
     });
+
+    return post;
   }
 }
