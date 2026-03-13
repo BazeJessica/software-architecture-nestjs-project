@@ -8,7 +8,7 @@ import { SQLiteCommentEntity } from '../entities/comment.sqlite.entity';
 export class SQLiteCommentRepository implements CommentRepository {
   constructor(private readonly dataSource: DataSource) {}
 
-  async save(comment: CommentEntity): Promise<void> {
+  async createComment(comment: CommentEntity): Promise<void> {
     const json = comment.toJSON();
     await this.dataSource.getRepository(SQLiteCommentEntity).save({
       id: json.id as string,
@@ -16,6 +16,17 @@ export class SQLiteCommentRepository implements CommentRepository {
       postId: json.postId as string,
       authorId: json.authorId as string,
     });
+  }
+
+  async findAll(): Promise<CommentEntity[]> {
+    const entities = await this.dataSource
+      .getRepository(SQLiteCommentEntity)
+      .find();
+    return entities.map(entity => CommentEntity.reconstitute({
+      ...entity,
+      createdAt: entity.createdAt.toISOString(),
+      updatedAt: entity.updatedAt.toISOString(),
+    }));
   }
 
   async findById(id: string): Promise<CommentEntity | null> {
@@ -31,25 +42,26 @@ export class SQLiteCommentRepository implements CommentRepository {
       : null;
   }
 
-  async findByPostId(id: string): Promise<CommentEntity | null> {
-    const entity = await this.dataSource
+  async findByPostId(postId: string): Promise<CommentEntity[]> {
+    const entities = await this.dataSource
       .getRepository(SQLiteCommentEntity)
-      .findOne({ where: { id } });
-    if (!entity) return null;
-    return CommentEntity.reconstitute({
+      .find({ where: { postId } });
+    return entities.map(entity => CommentEntity.reconstitute({
       ...entity,
       createdAt: entity.createdAt.toISOString(),
       updatedAt: entity.updatedAt.toISOString(),
+    }));
+  }
+
+  async updateComment(id: string, comment: CommentEntity): Promise<void> {
+    const json = comment.toJSON();
+    await this.dataSource.getRepository(SQLiteCommentEntity).update(id, {
+      content: json.content as string,
+      updatedAt: new Date(),
     });
   }
 
-  async delete(id: string): Promise<void> {
+  async deleteComment(id: string): Promise<void> {
     await this.dataSource.getRepository(SQLiteCommentEntity).delete(id);
-  }
-
-  async countByPostId(postId: string): Promise<number> {
-    return this.dataSource
-      .getRepository(SQLiteCommentEntity)
-      .count({ where: { postId } });
   }
 }
