@@ -8,9 +8,10 @@ export class CommentEntity {
     private _updatedAt: Date;
 
     private constructor(
-        readonly id:string;
+        readonly id: string,
         content: string,
         postId: string,
+
         authorId: string,
         createdAt: Date,
         updatedAt: Date,

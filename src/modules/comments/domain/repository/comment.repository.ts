@@ -4,11 +4,11 @@ export abstract class CommentRepository {
 
   public abstract findById(id: string): Promise<CommentEntity | null>;
 
-  public abstract findByPostId(name: string): Promise<CommentEntity | null>;
+  public abstract findByPostId(postId: string): Promise<CommentEntity[]>;
 
   public abstract deleteComment(id: string): Promise<void>;
 
-  public abstract createComment(tag: CommentEntity): Promise<void>;
+  public abstract createComment(comment: CommentEntity): Promise<void>;
 
   public abstract updateComment(
     id: string,

@@ -1,7 +1,7 @@
 import { Inject, Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { COMMENT_REPOSITORY_TOKEN } from '../../domain/repositories/comment.repository';
-import type { CommentRepository } from '../../domain/repositories/comment.repository';
+import { COMMENT_REPOSITORY_TOKEN } from '../../domain/repository/comment.repository';
+import type { CommentRepository } from '../../domain/repository/comment.repository';
 import { CommentEntity } from '../../domain/entities/comment.entity';
 import { PostRepository } from '../../../posts/domain/repositories/post.repository';
 
@@ -11,7 +11,7 @@ export class CommentCreatedEvent {
     public readonly postId: string,
     public readonly authorId: string,
     public readonly postAuthorId: string,
-  ) {}
+  ) { }
 }
 
 export interface CreateCommentCommand {
@@ -27,7 +27,7 @@ export class CreateCommentUseCase {
     private readonly commentRepository: CommentRepository,
     private readonly postRepository: PostRepository,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+  ) { }
 
   async execute(command: CreateCommentCommand): Promise<CommentEntity> {
     const post = await this.postRepository.getPostById(command.postId);
@@ -47,7 +47,7 @@ export class CreateCommentUseCase {
       command.authorId,
     );
 
-    await this.commentRepository.save(comment);
+    await this.commentRepository.createComment(comment);
 
     // Emit event for notifications
     this.eventEmitter.emit(
