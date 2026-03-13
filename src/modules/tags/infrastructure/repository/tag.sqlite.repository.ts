@@ -8,7 +8,7 @@ import { SQLiteTagEntity } from '../entity/tag.sqlite.entity';
 export class SQLiteTagRepository implements TagRepository {
   constructor(private readonly dataSource: DataSource) {}
 
-  public async updatetag(id: string, input: TagEntity): Promise<void> {
+  public async updateTag(id: string, input: TagEntity): Promise<void> {
     await this.dataSource
       .getRepository(SQLiteTagEntity)
       .update(id, input.toJSON());

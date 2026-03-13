@@ -23,13 +23,13 @@ export class UpdateTagUseCase {
     }
 
     const name = input.name.toLowerCase();
-    const existingTag = await this.tagRepository.findById(input.id);
+    const existingTag = await this.tagRepository.findById(id);
     if (!existingTag) {
-      throw new Error(`Tag with id ${input.id} not found`);
+      throw new Error(`Tag with id ${id} not found`);
     }
 
     const existingNameTag = await this.tagRepository.findByName(name);
-    if (existingNameTag && existingNameTag.id !== input.id) {
+    if (existingNameTag && existingNameTag.id !== id) {
       throw new Error(`Tag with name ${name} already exists`);
     }
 
@@ -38,7 +38,7 @@ export class UpdateTagUseCase {
 
     if (tag) {
       tag.update(input.name);
-      await this.tagRepository.updatetag(id, tag);
+      await this.tagRepository.updateTag(id, tag);
       return tag;
     }
 

@@ -16,7 +16,7 @@ import {
 import { Requester } from '../../../shared/auth/infrastructure/decorators/requester.decorator';
 import { JwtAuthGuard } from '../../../shared/auth/infrastructure/guards/jwt-auth.guard';
 import { UserEntity } from '../../../users/domain/entities/user.entity';
-import { CreateTagDto } from '../../application/dtos/creaye-tags.dto';
+import { CreateTagDto } from '../../application/dtos/create-tags.dto';
 import { UpdateTagDto } from '../../application/dtos/update-tags.dto';
 import { CreateTagUseCase } from '../../application/use-cases/create-tag.use-case';
 import { UpdateTagUseCase } from '../../application/use-cases/update-tag.use-case';
@@ -31,7 +31,7 @@ export class TagsController {
     private readonly updateTagUseCase: UpdateTagUseCase,
     private readonly deleteTagUseCase: DeleteTagUseCase,
     private readonly getTagUseCase: GetTagUseCase,
-  ) {}
+  ) { }
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -71,7 +71,6 @@ export class TagsController {
     const tag = await this.updateTagUseCase.execute(
       id,
       {
-        id,
         name: updateTagDto.name,
       },
       user,

@@ -7,15 +7,18 @@ import { SQLiteTagRepository } from './infrastructure/repository/tag.sqlite.repo
 import { SQLiteTagEntity } from './infrastructure/entity/tag.sqlite.entity';
 import { TagsController } from './infrastructure/controller/tag.controller';
 import { GetTagUseCase } from './application/use-cases/get-tag.use-case';
-import { TAG_REPOSITORY_TOKEN } from './domain/repository/tag.repository';
-import { TagCreatedEvent } from './domain/event/tag-created.event';
+import { LoggingModule } from '../shared/logging/logging.module';
+import { TagRepository } from './domain/repository/tag.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SQLiteTagEntity])],
+  imports: [
+    TypeOrmModule.forFeature([SQLiteTagEntity]),
+    LoggingModule,
+  ],
   controllers: [TagsController],
   providers: [
     {
-      provide: TAG_REPOSITORY_TOKEN,
+      provide: TagRepository,
       useClass: SQLiteTagRepository,
     },
     CreateTagUseCase,
@@ -23,6 +26,6 @@ import { TagCreatedEvent } from './domain/event/tag-created.event';
     DeleteTagUseCase,
     GetTagUseCase,
   ],
-  exports: [TAG_REPOSITORY_TOKEN, TypeOrmModule, TagCreatedEvent],
+  exports: [TagRepository],
 })
-export class TagModule {}
+export class TagModule { }
