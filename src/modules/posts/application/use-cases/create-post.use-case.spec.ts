@@ -16,6 +16,7 @@ describe('CreatePostUseCase', () => {
   beforeEach(() => {
     postRepository = {
       createPost: jest.fn().mockResolvedValue(undefined),
+      getPostBySlug: jest.fn().mockResolvedValue(undefined),
     } as unknown as jest.Mocked<PostRepository>;
     eventEmitter = {
       emit: jest.fn(),

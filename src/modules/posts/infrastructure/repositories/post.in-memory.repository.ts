@@ -6,13 +6,29 @@ import { PostRepository } from '../../domain/repositories/post.repository';
 export class InMemoryPostRepository implements PostRepository {
   private posts: Record<string, unknown>[] = [];
 
-  public getPosts(): PostEntity[] {
+  public getPosts(tags?: string): PostEntity[] {
     console.log('InMemoryPostRepository.getPosts');
-    return this.posts.map((post) => PostEntity.reconstitute(post));
+    let data = this.posts.map((post) => PostEntity.reconstitute(post));
+    
+    if (tags) {
+      const tagList = tags.split(',').map((t) => t.trim().toLowerCase());
+      data = data.filter((post) =>
+        post.tags.some((tag) => tagList.includes(tag.name.toLowerCase())),
+      );
+    }
+    return data;
   }
 
   public getPostById(id: string) {
     const post = this.posts.find((post) => post.id === id);
+
+    if (post) {
+      return PostEntity.reconstitute(post);
+    }
+  }
+
+  public getPostBySlug(slug: string) {
+    const post = this.posts.find((post) => post.slug === slug);
 
     if (post) {
       return PostEntity.reconstitute(post);

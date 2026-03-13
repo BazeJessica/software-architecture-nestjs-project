@@ -34,7 +34,7 @@ export class InMemoryTagRepository implements TagRepository {
     return Promise.resolve();
   }
 
-  public async updatetag(id: string, input: TagEntity): Promise<void> {
+  public async updateTag(id: string, input: TagEntity): Promise<void> {
     this.tags = this.tags.map((tag) => {
       if (tag.id !== id) {
         return tag;
