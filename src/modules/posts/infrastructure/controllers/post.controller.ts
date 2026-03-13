@@ -180,7 +180,7 @@ export class PostController {
   @Post(':postId/tags/:tagId')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add a tag to a post' })
   public async addTagToPost(
     @Requester() user: UserEntity,
