@@ -4,8 +4,8 @@ import {
   NotFoundException,
   ForbiddenException,
 } from '@nestjs/common';
-import { COMMENT_REPOSITORY_TOKEN } from '../../domain/repositories/comment.repository';
-import type { CommentRepository } from '../../domain/repositories/comment.repository';
+import { COMMENT_REPOSITORY_TOKEN } from '../../domain/repository/comment.repository';
+import type { CommentRepository } from '../../domain/repository/comment.repository';
 import type { UserEntity } from '../../../users/domain/entities/user.entity';
 
 export interface DeleteCommentCommand {
@@ -35,6 +35,6 @@ export class DeleteCommentUseCase {
       );
     }
 
-    await this.commentRepository.delete(command.commentId);
+    await this.commentRepository.deleteComment(command.commentId);
   }
 }
