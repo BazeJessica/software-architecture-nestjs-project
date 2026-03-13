@@ -10,7 +10,9 @@ export class LoginUseCase {
     private readonly jwtService: JwtService,
   ) {}
 
-  public async execute(input: LoginDto): Promise<{ accessToken: string }> {
+  public async execute(
+    input: LoginDto,
+  ): Promise<{ accessToken: string; user: any }> {
     const user = await this.authRepository.findUserByUsername(input.username);
 
     if (!user || !user.checkPassword(input.password)) {
@@ -18,7 +20,11 @@ export class LoginUseCase {
     }
 
     const payload = { sub: user.id, ...user.toJSON() };
+    const accessToken = this.jwtService.sign(payload);
 
-    return { accessToken: this.jwtService.sign(payload) };
+    return {
+      accessToken,
+      user: user.toJSON(),
+    };
   }
 }

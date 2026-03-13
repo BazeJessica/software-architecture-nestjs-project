@@ -8,7 +8,7 @@ export class PostPermissions {
   ) {}
 
   public canCreate(): boolean {
-    return this.role === 'writer';
+    return this.role === 'writer' || this.role === 'admin';
   }
 
   public canUpdateContent(post: PostEntity): boolean {
