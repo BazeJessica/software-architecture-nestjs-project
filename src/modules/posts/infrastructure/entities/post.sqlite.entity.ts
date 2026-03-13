@@ -13,7 +13,7 @@ export class SQLitePostEntity {
   @Column()
   content: string;
 
-  @Column(type: 'text')
+  @Column({ type: 'text' })
   status: PostStatus;
 
   @Column()

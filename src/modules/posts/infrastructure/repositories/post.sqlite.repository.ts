@@ -8,18 +8,35 @@ import { SQLiteTagEntity } from 'src/modules/tags/infrastructure/entity/tag.sqli
 export class SQLitePostRepository implements PostRepository {
   constructor(private readonly dataSource: DataSource) {}
 
-  public async getPosts(): Promise<PostEntity[]> {
+  public async getPosts(tags?: string): Promise<PostEntity[]> {
     const data = await this.dataSource.getRepository(SQLitePostEntity).find({
       relations: ['tags'],
     });
 
-    return data.map((post) => PostEntity.reconstitute({ ...post }));
+    if (!tags) {
+      return data.map((post) => PostEntity.reconstitute({ ...post }));
+    }
+
+    const tagList = tags.split(',').map((t) => t.trim().toLowerCase());
+    const filteredData = data.filter((post) =>
+      post.tags?.some((tag) => tagList.includes(tag.name.toLowerCase())),
+    );
+
+    return filteredData.map((post) => PostEntity.reconstitute({ ...post }));
   }
 
   public async getPostById(id: string): Promise<PostEntity | undefined> {
     const post = await this.dataSource
       .getRepository(SQLitePostEntity)
       .findOne({ where: { id }, relations: ['tags'] });
+
+    return post ? PostEntity.reconstitute({ ...post }) : undefined;
+  }
+
+  public async getPostBySlug(slug: string): Promise<PostEntity | undefined> {
+    const post = await this.dataSource
+      .getRepository(SQLitePostEntity)
+      .findOne({ where: { slug }, relations: ['tags'] });
 
     return post ? PostEntity.reconstitute({ ...post }) : undefined;
   }
